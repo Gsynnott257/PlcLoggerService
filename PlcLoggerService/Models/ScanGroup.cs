@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace PlcLoggerService.Models
-{
-    internal class ScanGroup
-    {
-    }
+﻿namespace PlcLoggerService.Models;
+public sealed class ScanGroup 
+{ 
+    public string Name { get; set; } = ""; 
+    public int PeriodMs { get; set; } = 1000; 
 }
