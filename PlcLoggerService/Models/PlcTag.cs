@@ -4,8 +4,8 @@ public sealed class PlcTag
     public int TagId { get; set; }
     public int PlcId { get; set; }
     public string TagName { get; set; } = "";
-    public string Address { get; set; } = "";   // e.g., gPointSelectionArray[5]
-    public string DataType { get; set; } = "";   // DINT, REAL, BOOL
+    public string Address { get; set; } = "";   
+    public string DataType { get; set; } = "";   
     public string ScanGroup { get; set; } = "slow";
     public double? Deadband { get; set; }
     public int? MinMs { get; set; }

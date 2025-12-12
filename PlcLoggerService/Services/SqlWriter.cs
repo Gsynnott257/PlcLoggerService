@@ -18,7 +18,6 @@ public sealed class SqlWriter(string connStr)
         }
         return (v, ts);
     }
-
     public async Task UpdateLastAsync(int tagId, object? value, double? numeric, CancellationToken ct)
     {
         using var conn = new SqlConnection(connStr);
@@ -35,9 +34,7 @@ VALUES (@tag_id,@s,@n,SYSUTCDATETIME());", conn);
         cmd.Parameters.AddWithValue("@n", (object?)numeric ?? DBNull.Value);
         await cmd.ExecuteNonQueryAsync(ct);
     }
-
-    public async Task InsertEventAsync(int plcId, PlcTag tag, object? value, double? numeric, string quality,
-                                       DateTime? srcUtc, CancellationToken ct)
+    public async Task InsertEventAsync(int plcId, PlcTag tag, object? value, double? numeric, string quality, DateTime? srcUtc, CancellationToken ct)
     {
         using var conn = new SqlConnection(connStr);
         await conn.OpenAsync(ct);
