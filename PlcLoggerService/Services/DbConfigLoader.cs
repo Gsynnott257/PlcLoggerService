@@ -1,22 +1,15 @@
 ﻿using Microsoft.Data.SqlClient;
 using PlcLoggerService.Models;
 namespace PlcLoggerService.Services;
-public sealed class DbConfigLoader
+public sealed class DbConfigLoader(string connStr)
 {
-    private readonly string _connStr;
-    public DbConfigLoader(string connStr) => _connStr = connStr;
-
     public async Task<(List<PlcEndpoint> Endpoints, List<PlcTag> Tags)> LoadAsync(CancellationToken ct)
     {
         var endpoints = new List<PlcEndpoint>();
         var tags = new List<PlcTag>();
-
-        using var conn = new SqlConnection(_connStr);
+        using var conn = new SqlConnection(connStr);
         await conn.OpenAsync(ct);
-
-        // Endpoints
-        using (var cmd = new SqlCommand(
-            "SELECT plc_id, ip_address, slot, enabled, note FROM dbo.PlcEndpoint WHERE enabled=1", conn))
+        using (var cmd = new SqlCommand("SELECT plc_id, ip_address, slot, enabled, note FROM dbo.PlcEndpoint WHERE enabled=1", conn))
         using (var rd = await cmd.ExecuteReaderAsync(ct))
         {
             while (await rd.ReadAsync(ct))
@@ -30,13 +23,7 @@ public sealed class DbConfigLoader
                     Name = $"Plc_{rd.GetInt32(0)}"
                 });
         }
-
-        // Tags (note the new columns)
-        using (var cmd = new SqlCommand(
-            @"SELECT tag_id, plc_id, tag_name, address, data_type, scan_group, deadband,
-                     min_interval_ms, max_interval_ms, enabled, is_array, elem_count
-              FROM dbo.PlcTag
-              WHERE enabled=1", conn))
+        using (var cmd = new SqlCommand(@"SELECT tag_id, plc_id, tag_name, address, data_type, scan_group, deadband, min_interval_ms, max_interval_ms, enabled, is_array, elem_count FROM dbo.PlcTag WHERE enabled=1", conn))
         using (var rd = await cmd.ExecuteReaderAsync(ct))
         {
             while (await rd.ReadAsync(ct))
@@ -56,10 +43,7 @@ public sealed class DbConfigLoader
                     ElemCount = rd.IsDBNull(11) ? (int?)null : rd.GetInt32(11)
                 });
         }
-
         return (endpoints, tags);
     }
-
-    public static string ComputePath(int? slot)
-        => $"1,{slot ?? 0}"; // common backplane path for Logix (adjust per chassis)
+    public static string ComputePath(int? slot) => $"1,{slot ?? 0}";
 }
